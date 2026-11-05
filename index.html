@@ -19,20 +19,47 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 2rem 1.5rem;
+      padding: 1.5rem 1.25rem;
       overflow-x: hidden;
     }
     header { text-align: center; }
-    h1 { font-size: 1.4rem; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: #a1a1aa; }
+    h1 { font-size: 1.25rem; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: #a1a1aa; }
+    
+    /* Preset Selector */
+    .preset-bar {
+      display: flex;
+      gap: 0.4rem;
+      margin-top: 0.75rem;
+      background: #121215;
+      padding: 0.25rem;
+      border-radius: 999px;
+      border: 1px solid #27272a;
+    }
+    .preset-btn {
+      background: transparent;
+      border: none;
+      color: #71717a;
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .preset-btn.active {
+      background: #27272a;
+      color: #fafafa;
+    }
+
     .phase-badge {
       display: inline-block;
-      margin-top: 0.5rem;
+      margin-top: 0.75rem;
       padding: 0.25rem 0.75rem;
       border-radius: 999px;
       font-size: 0.75rem;
       letter-spacing: 0.05em;
       background: #18181b;
-      color: #71717a;
+      color: #a1a1aa;
       border: 1px solid #27272a;
     }
 
@@ -44,20 +71,20 @@
       justify-content: center;
       width: 100%;
       max-width: 320px;
-      margin: 1.5rem 0;
+      margin: 1rem 0;
       position: relative;
     }
     .orb-container {
-      width: 180px;
-      height: 180px;
+      width: 170px;
+      height: 170px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
     }
     .pulse-orb {
-      width: 120px;
-      height: 120px;
+      width: 110px;
+      height: 110px;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(239, 68, 68, 0.45) 0%, rgba(0, 0, 0, 0) 70%);
       transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), background 1.5s ease;
@@ -72,7 +99,7 @@
       text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
     }
     .focus-text {
-      margin-top: 1.5rem;
+      margin-top: 1.25rem;
       font-size: 1rem;
       letter-spacing: 0.05em;
       color: #d4d4d8;
@@ -84,6 +111,7 @@
       color: #71717a;
       text-align: center;
       margin-top: 0.35rem;
+      min-height: 1.2rem;
     }
 
     /* Timers & Controls */
@@ -93,7 +121,7 @@
       font-weight: 300;
       letter-spacing: 0.05em;
       color: #e4e4e7;
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
     }
     .action-btn {
       width: 100%;
@@ -111,7 +139,7 @@
     .action-btn:active { transform: scale(0.98); background: #3f3f46; }
     .toggle-row {
       display: flex;
-      gap: 1rem;
+      gap: 1.2rem;
       margin-top: 1rem;
       font-size: 0.8rem;
       color: #71717a;
@@ -122,7 +150,15 @@
 
   <header>
     <h1>Tantra Sadhana</h1>
-    <span class="phase-badge" id="phaseBadge">Preparation</span>
+    <div class="preset-bar" id="presetBar">
+      <button class="preset-btn active" data-preset="60">60m Full</button>
+      <button class="preset-btn" data-preset="30">30m</button>
+      <button class="preset-btn" data-preset="15">15m</button>
+      <button class="preset-btn" data-preset="2">2m Demo</button>
+    </div>
+    <div>
+      <span class="phase-badge" id="phaseBadge">Preparation</span>
+    </div>
   </header>
 
   <div class="center-stage">
@@ -131,7 +167,7 @@
       <div class="mantra-display" id="mantraText">LAM</div>
     </div>
     <div class="focus-text" id="focusText">Feet flat, hands resting on thighs</div>
-    <div class="instruction-text" id="subText">Press Begin to start the 60-minute ascent</div>
+    <div class="instruction-text" id="subText">Press Begin to start the sadhana</div>
   </div>
 
   <div style="display:flex; flex-direction:column; align-items:center; width: 100%;">
@@ -144,14 +180,13 @@
   </div>
 
   <script>
-    // Service Worker Registration
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(console.error);
       });
     }
 
-    // Audio Engine: Tibetan Bowl & Harmonic Drone via Web Audio API
+    // Audio Engine: Tibetan Bowl & Drone via Web Audio API
     let audioCtx = null;
     let droneOsc = null;
     let droneGain = null;
@@ -168,18 +203,18 @@
     function playSingingBowl() {
       initAudio();
       const partials = [216, 598, 1024, 1540];
-      const gains = [0.4, 0.2, 0.08, 0.04];
+      const gains = [0.35, 0.18, 0.08, 0.03];
       partials.forEach((freq, idx) => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
         gain.gain.setValueAtTime(gains[idx], audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 6.5);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 6.0);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + 7.0);
+        osc.stop(audioCtx.currentTime + 6.5);
       });
     }
 
@@ -189,7 +224,7 @@
       droneOsc = audioCtx.createOscillator();
       droneGain = audioCtx.createGain();
       droneOsc.type = 'triangle';
-      droneOsc.frequency.setValueAtTime(108, audioCtx.currentTime); // 108Hz octave of 432Hz
+      droneOsc.frequency.setValueAtTime(108, audioCtx.currentTime);
       droneGain.gain.setValueAtTime(0.01, audioCtx.currentTime);
       droneGain.gain.exponentialRampToValueAtTime(0.04, audioCtx.currentTime + 3);
       droneOsc.connect(droneGain);
@@ -199,24 +234,55 @@
 
     function stopDrone() {
       if (droneGain) {
-        droneGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2);
+        droneGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.5);
         setTimeout(() => {
           if (droneOsc) { droneOsc.stop(); droneOsc = null; }
-        }, 2000);
+        }, 1500);
       }
     }
 
-    // Sadhana Sequence Definition (60 Minutes)
-    const SEQUENCE = [
-      { id: 'box', name: 'Phase I: Box Breath', mantra: 'LAM', focus: 'Box Breathing (4-4-4-4)', sub: 'Grounding in Muladhara', duration: 600, color: 'rgba(239, 68, 68, 0.5)' },
-      { id: 'mula', name: 'Phase II: Spinal Ascent', mantra: 'LAM', focus: 'Base of Spine — Stability', sub: 'Muladhara Center', duration: 420, color: 'rgba(239, 68, 68, 0.45)' },
-      { id: 'svadh', name: 'Phase II: Spinal Ascent', mantra: 'VAM', focus: 'Lower Belly — Fluid Ease', sub: 'Svadhisthana Center', duration: 420, color: 'rgba(249, 115, 22, 0.45)' },
-      { id: 'mani', name: 'Phase II: Spinal Ascent', mantra: 'RAM', focus: 'Navel Core — Inner Strength', sub: 'Manipura Center', duration: 420, color: 'rgba(234, 179, 8, 0.45)' },
-      { id: 'anah', name: 'Phase II: Spinal Ascent', mantra: 'YAM', focus: 'Heart Center — Spacious Peace', sub: 'Anahata Center', duration: 420, color: 'rgba(34, 197, 94, 0.45)' },
-      { id: 'vish', name: 'Phase II: Spinal Ascent', mantra: 'HAM', focus: 'Throat Base — Mental Silence', sub: 'Vishuddha Center', duration: 420, color: 'rgba(59, 130, 246, 0.45)' },
-      { id: 'rest', name: 'Phase III: Stillness', mantra: '—', focus: 'Drop Mantras — Rest in Silence', sub: 'Absorb the Energy', duration: 900, color: 'rgba(168, 85, 247, 0.3)' }
-    ];
+    // Preset Configurations
+    const PRESETS = {
+      60: [
+        { id: 'box', name: 'Phase I: Box Breath', mantra: 'LAM', focus: 'Box Breathing (4-4-4-4)', sub: 'Grounding in Muladhara', duration: 600, color: 'rgba(239, 68, 68, 0.5)' },
+        { id: 'mula', name: 'Phase II: Spinal Ascent', mantra: 'LAM', focus: 'Base of Spine — Stability', sub: 'Muladhara Center', duration: 420, color: 'rgba(239, 68, 68, 0.45)' },
+        { id: 'svadh', name: 'Phase II: Spinal Ascent', mantra: 'VAM', focus: 'Lower Belly — Fluid Ease', sub: 'Svadhisthana Center', duration: 420, color: 'rgba(249, 115, 22, 0.45)' },
+        { id: 'mani', name: 'Phase II: Spinal Ascent', mantra: 'RAM', focus: 'Navel Core — Inner Strength', sub: 'Manipura Center', duration: 420, color: 'rgba(234, 179, 8, 0.45)' },
+        { id: 'anah', name: 'Phase II: Spinal Ascent', mantra: 'YAM', focus: 'Heart Center — Spacious Peace', sub: 'Anahata Center', duration: 420, color: 'rgba(34, 197, 94, 0.45)' },
+        { id: 'vish', name: 'Phase II: Spinal Ascent', mantra: 'HAM', focus: 'Throat Base — Mental Silence', sub: 'Vishuddha Center', duration: 420, color: 'rgba(59, 130, 246, 0.45)' },
+        { id: 'rest', name: 'Phase III: Stillness', mantra: '—', focus: 'Drop Mantras — Rest in Silence', sub: 'Absorb the Energy', duration: 900, color: 'rgba(168, 85, 247, 0.3)' }
+      ],
+      30: [
+        { id: 'box', name: 'Phase I: Box Breath', mantra: 'LAM', focus: 'Box Breathing (4-4-4-4)', sub: 'Grounding in Muladhara', duration: 300, color: 'rgba(239, 68, 68, 0.5)' },
+        { id: 'mula', name: 'Phase II: Spinal Ascent', mantra: 'LAM', focus: 'Base of Spine — Stability', sub: 'Muladhara Center', duration: 180, color: 'rgba(239, 68, 68, 0.45)' },
+        { id: 'svadh', name: 'Phase II: Spinal Ascent', mantra: 'VAM', focus: 'Lower Belly — Fluid Ease', sub: 'Svadhisthana Center', duration: 180, color: 'rgba(249, 115, 22, 0.45)' },
+        { id: 'mani', name: 'Phase II: Spinal Ascent', mantra: 'RAM', focus: 'Navel Core — Inner Strength', sub: 'Manipura Center', duration: 180, color: 'rgba(234, 179, 8, 0.45)' },
+        { id: 'anah', name: 'Phase II: Spinal Ascent', mantra: 'YAM', focus: 'Heart Center — Spacious Peace', sub: 'Anahata Center', duration: 180, color: 'rgba(34, 197, 94, 0.45)' },
+        { id: 'vish', name: 'Phase II: Spinal Ascent', mantra: 'HAM', focus: 'Throat Base — Mental Silence', sub: 'Vishuddha Center', duration: 180, color: 'rgba(59, 130, 246, 0.45)' },
+        { id: 'rest', name: 'Phase III: Stillness', mantra: '—', focus: 'Drop Mantras — Rest in Silence', sub: 'Absorb the Energy', duration: 600, color: 'rgba(168, 85, 247, 0.3)' }
+      ],
+      15: [
+        { id: 'box', name: 'Phase I: Box Breath', mantra: 'LAM', focus: 'Box Breathing (4-4-4-4)', sub: 'Quick Grounding', duration: 180, color: 'rgba(239, 68, 68, 0.5)' },
+        { id: 'mula', name: 'Phase II: Spinal Ascent', mantra: 'LAM', focus: 'Base of Spine — Stability', sub: 'Muladhara', duration: 90, color: 'rgba(239, 68, 68, 0.45)' },
+        { id: 'svadh', name: 'Phase II: Spinal Ascent', mantra: 'VAM', focus: 'Lower Belly — Fluid Ease', sub: 'Svadhisthana', duration: 90, color: 'rgba(249, 115, 22, 0.45)' },
+        { id: 'mani', name: 'Phase II: Spinal Ascent', mantra: 'RAM', focus: 'Navel Core — Inner Strength', sub: 'Manipura', duration: 90, color: 'rgba(234, 179, 8, 0.45)' },
+        { id: 'anah', name: 'Phase II: Spinal Ascent', mantra: 'YAM', focus: 'Heart Center — Spacious Peace', sub: 'Anahata', duration: 90, color: 'rgba(34, 197, 94, 0.45)' },
+        { id: 'vish', name: 'Phase II: Spinal Ascent', mantra: 'HAM', focus: 'Throat Base — Mental Silence', sub: 'Vishuddha', duration: 90, color: 'rgba(59, 130, 246, 0.45)' },
+        { id: 'rest', name: 'Phase III: Stillness', mantra: '—', focus: 'Drop Mantras — Rest in Silence', sub: 'Absorb the Energy', duration: 270, color: 'rgba(168, 85, 247, 0.3)' }
+      ],
+      2: [
+        { id: 'box', name: 'Demo: Box Breath', mantra: 'LAM', focus: 'Box Breathing (4-4-4-4)', sub: 'Testing Box Breath', duration: 24, color: 'rgba(239, 68, 68, 0.5)' },
+        { id: 'mula', name: 'Demo: Ascent', mantra: 'LAM', focus: 'Base of Spine — Stability', sub: 'Muladhara', duration: 15, color: 'rgba(239, 68, 68, 0.45)' },
+        { id: 'svadh', name: 'Demo: Ascent', mantra: 'VAM', focus: 'Lower Belly — Fluid Ease', sub: 'Svadhisthana', duration: 15, color: 'rgba(249, 115, 22, 0.45)' },
+        { id: 'mani', name: 'Demo: Ascent', mantra: 'RAM', focus: 'Navel Core — Inner Strength', sub: 'Manipura', duration: 15, color: 'rgba(234, 179, 8, 0.45)' },
+        { id: 'anah', name: 'Demo: Ascent', mantra: 'YAM', focus: 'Heart Center — Spacious Peace', sub: 'Anahata', duration: 15, color: 'rgba(34, 197, 94, 0.45)' },
+        { id: 'vish', name: 'Demo: Ascent', mantra: 'HAM', focus: 'Throat Base — Mental Silence', sub: 'Vishuddha', duration: 15, color: 'rgba(59, 130, 246, 0.45)' },
+        { id: 'rest', name: 'Demo: Silence', mantra: '—', focus: 'Drop Mantras — Rest in Silence', sub: 'Absorb the Energy', duration: 21, color: 'rgba(168, 85, 247, 0.3)' }
+      ]
+    };
 
+    let activePresetKey = '60';
+    let currentSequence = PRESETS[activePresetKey];
     let isRunning = false;
     let stepIndex = 0;
     let timeInStep = 0;
@@ -231,13 +297,42 @@
     const focusText = document.getElementById('focusText');
     const subText = document.getElementById('subText');
     const orb = document.getElementById('orb');
+    const presetBar = document.getElementById('presetBar');
 
-    // Box Breathing Loop (Inhale 4s, Hold 4s, Exhale 4s, Hold 4s)
+    function calculateTotalSeconds(seq) {
+      return seq.reduce((acc, curr) => acc + curr.duration, 0);
+    }
+
+    function selectPreset(key) {
+      if (isRunning) pauseSadhana();
+      activePresetKey = key;
+      currentSequence = PRESETS[key];
+      totalSecondsLeft = calculateTotalSeconds(currentSequence);
+      stepIndex = 0;
+      timeInStep = 0;
+      timerEl.textContent = formatTime(totalSecondsLeft);
+      phaseBadge.textContent = 'Ready';
+      mantraText.textContent = currentSequence[0].mantra;
+      focusText.textContent = 'Feet flat, hands resting on thighs';
+      subText.textContent = `Selected: ${key === '2' ? '2-min Demo' : key + '-min Sadhana'}`;
+      orb.style.background = `radial-gradient(circle, ${currentSequence[0].color} 0%, rgba(0,0,0,0) 70%)`;
+      orb.style.transform = 'scale(1)';
+
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.preset === key);
+      });
+    }
+
+    presetBar.addEventListener('click', (e) => {
+      const btn = e.target.closest('.preset-btn');
+      if (btn) selectPreset(btn.dataset.preset);
+    });
+
     function runBoxBreathingLoop() {
       let phase = 0;
       const phases = ['Inhale (4s)', 'Hold (4s)', 'Exhale (4s)', 'Hold (4s)'];
       boxTimer = setInterval(() => {
-        if (!isRunning || SEQUENCE[stepIndex].id !== 'box') {
+        if (!isRunning || currentSequence[stepIndex].id !== 'box') {
           clearInterval(boxTimer);
           return;
         }
@@ -291,11 +386,11 @@
       timeInStep++;
       timerEl.textContent = formatTime(totalSecondsLeft);
 
-      if (timeInStep >= SEQUENCE[stepIndex].duration) {
+      if (timeInStep >= currentSequence[stepIndex].duration) {
         stepIndex++;
         timeInStep = 0;
-        if (stepIndex < SEQUENCE.length) {
-          applyStage(SEQUENCE[stepIndex]);
+        if (stepIndex < currentSequence.length) {
+          applyStage(currentSequence[stepIndex]);
         }
       }
     }
@@ -308,7 +403,7 @@
       if ('wakeLock' in navigator) {
         navigator.wakeLock.request('screen').catch(() => {});
       }
-      applyStage(SEQUENCE[stepIndex]);
+      applyStage(currentSequence[stepIndex]);
       intervalTimer = setInterval(tick, 1000);
     }
 
@@ -332,7 +427,7 @@
       subText.textContent = 'Rest in peace and clarity';
       startBtn.textContent = 'BEGIN AGAIN';
       stepIndex = 0;
-      totalSecondsLeft = 3600;
+      totalSecondsLeft = calculateTotalSeconds(currentSequence);
     }
 
     startBtn.addEventListener('click', () => {
@@ -342,6 +437,9 @@
         pauseSadhana();
       }
     });
+
+    // Initialize with 60-minute default
+    selectPreset('60');
   </script>
 </body>
 </html>
